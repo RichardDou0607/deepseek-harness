@@ -36,6 +36,7 @@ import { serveWebDocument, authenticateWebHost, forwardWebRequest } from './web-
 import { DesktopFatalRecovery } from './fatal-recovery.ts'
 import { pruneCrashReports, RendererConsoleTail, writeCrashReport, type CrashReportSource } from './crash-report.ts'
 import { openWelcomeWindow } from './welcome-window.ts'
+import { openSplashWindow } from './splash-window.ts'
 import { WELCOME_IPC, needsWelcome, type WelcomeNotice } from './welcome-api.ts'
 import { connectDesktopWelcome, type DesktopWelcomeBackend } from './welcome-backend.ts'
 import { DesktopUpdateJournal } from './update-journal.ts'
@@ -324,6 +325,8 @@ async function main(): Promise<void> {
   let workspaceRecovery: Promise<void> | undefined
   let mainWindow: BrowserWindow | undefined
   let welcomeWindow: BrowserWindow | undefined
+  let splashWindow: BrowserWindow | undefined
+  let splashDismissed = false
   let enteredWorkspace = false
   // NSIS passes --updated when it launches the application after installation.
   let raiseAfterUpdate = process.platform === 'win32' && process.argv.includes('--updated')
@@ -526,16 +529,49 @@ async function main(): Promise<void> {
   }
   stopForRecovery = () => backend.close()
 
+  const splashMode = process.env.DSH_DESKTOP_SPLASH
+  if (splashMode !== undefined && splashMode !== '0' && splashMode !== '1') {
+    throw new Error('desktop splash: DSH_DESKTOP_SPLASH must be 0 or 1')
+  }
+  /**
+   * Show the splash once per launch in an application shell (packaged or dev app) unless
+   * DSH_DESKTOP_SPLASH=0; best-effort, a failed load never blocks startup.
+   */
+  const showSplash = (): void => {
+    if (splashMode === '0') return
+    if (!app.isPackaged && process.env.DSH_DESKTOP_DEV_APP !== '1') return
+    if (splashWindow !== undefined || splashDismissed) return
+    void openSplashWindow().then((window) => {
+      if (splashDismissed || quitting) {
+        if (!window.isDestroyed()) window.destroy()
+        return
+      }
+      splashWindow = window
+      window.once('closed', () => { if (splashWindow === window) splashWindow = undefined })
+    }).catch((error: unknown) => { console.error('desktop splash: failed to load', error) })
+  }
+
+  /** Close the splash once a product window owns the screen; later calls are no-ops. */
+  const closeSplash = (): void => {
+    splashDismissed = true
+    const window = splashWindow
+    splashWindow = undefined
+    if (window !== undefined && !window.isDestroyed()) window.destroy()
+  }
+
   const reconcileBackend = (): Promise<void> => {
     startup ??= (async () => {
+      showSplash()
       await navigateMain(applicationUrl)
       await backend.start(async () => {
         await manager.applyRelease()
       })
       if (backend.host !== undefined) await openInitialWindow()
+      closeSplash()
       if (backend.host !== undefined) updateJournal?.action('workspace-ready')
       // The existing Web document resumes through the boot IPC response.
     })().catch((error: unknown) => {
+      closeSplash()
       updateJournal?.action('workspace-failed')
       reportFatal(error, 'main')
       throw error
@@ -1192,6 +1228,7 @@ async function main(): Promise<void> {
     stopAccount?.()
     if (welcomeWindow !== undefined && !welcomeWindow.isDestroyed()) welcomeWindow.hide()
     if (mainWindow !== undefined && !mainWindow.isDestroyed()) mainWindow.hide()
+    closeSplash()
     updateSchedule.dispose()
     updateDialog.dispose()
     mandatoryUI?.dispose()

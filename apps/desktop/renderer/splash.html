@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+      The document is the application's first visible surface while the Host
+      boots. It loads from disk before any network request, so it may reach
+      nothing: no origin, no font, and no preload bridge. The brand mark is
+      the same asset the welcome window shows; motion honors reduced-motion.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self'">
+    <title></title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        background: transparent;
+        color: #0f1115;
+        font: 14px/22px system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #f9fafb;
+        }
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        animation: splash-enter 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .brand {
+        display: block;
+        width: 236px;
+        height: auto;
+        animation: brand-settle 640ms cubic-bezier(0.2, 0.8, 0.2, 1) 100ms both;
+      }
+      .ring {
+        position: relative;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        corner-shape: round;
+        border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
+        animation: ring-spin 0.9s linear infinite;
+      }
+      .ring::after {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: inherit;
+        background: conic-gradient(currentColor 120deg, transparent 0);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+        mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+      }
+      @keyframes splash-enter {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes brand-settle {
+        from {
+          opacity: 0;
+          transform: scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes ring-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .stage,
+        .brand,
+        .ring {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <img class="brand" src="assets/welcome-brand.svg" alt="" aria-hidden="true">
+      <div class="ring" aria-hidden="true"></div>
+    </div>
+  </body>
+</html>

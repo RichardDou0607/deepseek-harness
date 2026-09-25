@@ -1,5 +1,11 @@
 /* The framework-free boot page cannot depend on theme delivery succeeding. */
 
+@property --dsh-boot-arc {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 72deg;
+}
+
 .boot {
   --dsh-boot-label-primary: #0f1115;
   --dsh-boot-label-secondary: #61666b;
@@ -26,6 +32,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  animation: boot-enter 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .wordmark {
@@ -34,12 +41,14 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--dsw-alias-label-primary, var(--dsh-boot-label-primary));
+  animation: boot-wordmark 640ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both;
 }
 
 .hint {
   font-size: 12px;
   line-height: 18px;
   color: var(--dsw-alias-label-tertiary, var(--dsh-boot-label-tertiary));
+  animation: boot-hint 480ms ease-out 320ms both;
 }
 
 .spinner {
@@ -50,6 +59,8 @@
   corner-shape: round;
   border: 2px solid var(--dsw-alias-border-l2, var(--dsh-boot-border));
   animation: spin 0.8s linear infinite;
+  /* The arc reads a registered custom property, so the growing arc eases between loader entries. */
+  transition: --dsh-boot-arc 220ms ease-out;
 }
 
 .spinner::after {
@@ -69,11 +80,39 @@
   to { transform: rotate(360deg); }
 }
 
+@keyframes boot-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes boot-wordmark {
+  from {
+    opacity: 0;
+    letter-spacing: 0.16em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.08em;
+  }
+}
+
+@keyframes boot-hint {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .failed {
   max-width: 480px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  animation: boot-enter 240ms ease-out both;
 }
 
 .failedTitle {
@@ -100,4 +139,17 @@
   line-height: 18px;
   color: var(--dsw-alias-label-secondary, var(--dsh-boot-label-secondary));
   white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .wordmark,
+  .hint,
+  .failed,
+  .spinner {
+    animation: none;
+  }
+  .spinner {
+    transition: none;
+  }
 }
