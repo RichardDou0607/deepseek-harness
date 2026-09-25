@@ -7,7 +7,9 @@ import { fileURLToPath } from 'node:url'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import {
+  desktopProductSlug,
   resolveDesktopAppId,
+  resolveDesktopProductName,
   resolveMacOSNotarizationEnvironment,
   resolveMacOSSigningEnvironment,
 } from './desktop-release-environment.mjs'
@@ -51,6 +53,8 @@ export function createElectronBuilderConfig(
   preparedRuntimeVersion = undefined,
 ) {
   const appId = resolveDesktopAppId(env)
+  const productName = resolveDesktopProductName(env)
+  const productSlug = desktopProductSlug(productName)
   const policy = resolveDesktopPolicyEnvironment(env)
   const targetPlatform = env.DSH_DESKTOP_TARGET_PLATFORM
   const resolvedPlatform = targetPlatform ?? hostPlatform
@@ -100,16 +104,16 @@ export function createElectronBuilderConfig(
   const packaged = resolveDesktopBuildCommit(env)
   return {
     appId,
-    protocols: [{ name: 'DeepSeek Harness', schemes: ['dsh'] }],
+    protocols: [{ name: productName, schemes: ['dsh'] }],
     extraMetadata: {
       dshDesktopAppId: appId,
       dshMandatoryUpdatePolicy: policy,
       ...buildVersion === productVersion ? {} : { version: buildVersion },
       ...packaged === undefined ? {} : { dshBuildCommit: packaged.commit, dshBuildDirty: packaged.dirty },
     },
-    productName: 'DeepSeek Harness',
+    productName,
     // Unsigned builds carry their own suffix so a shared file can never pass for a release artifact.
-    artifactName: `deepseek-harness-\${version}-\${os}-\${arch}${unsigned ? '-unsigned' : ''}.\${ext}`,
+    artifactName: `${productSlug}-\${version}-\${os}-\${arch}${unsigned ? '-unsigned' : ''}.\${ext}`,
     directories: { output: unsigned ? buildPaths.unsignedArtifacts : buildPaths.artifacts },
     asar: true,
     electronDist: buildPaths.electron,

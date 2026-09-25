@@ -1,6 +1,9 @@
 /** Environment variable that supplies the Electron application identifier. */
 export const DESKTOP_APP_ID_ENV: 'DSH_DESKTOP_APP_ID'
 
+/** Environment variable that supplies the packaged product display name. */
+export const PRODUCT_NAME_ENV: 'DSH_DESKTOP_PRODUCT_NAME'
+
 /** Environment variable that supplies electron-builder's macOS certificate qualifier. */
 export const MACOS_SIGNING_IDENTITY_ENV: 'DSH_DESKTOP_MACOS_SIGNING_IDENTITY'
 
@@ -48,6 +51,20 @@ export type MacOSNotarizationEnvironment =
  * @returns Reverse-DNS application identifier.
  */
 export function resolveDesktopAppId(env: NodeJS.ProcessEnv): string
+
+/**
+ * Resolve the packaged product display name shared by the bundle, installer, and protocol registration.
+ * @param env - Packaging environment.
+ * @returns Product display name; the official name unless a local build overrides it.
+ */
+export function resolveDesktopProductName(env: NodeJS.ProcessEnv): string
+
+/**
+ * Derive the lowercase artifact-name prefix for one product display name.
+ * @param productName - Resolved product display name.
+ * @returns Hyphen-separated slug; "deepseek-harness" for the official name.
+ */
+export function desktopProductSlug(productName: string): string
 
 /**
  * Resolve the npm registry used to materialize the bundled runtime and its external dependencies.

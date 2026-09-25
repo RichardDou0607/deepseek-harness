@@ -7,6 +7,8 @@ import { promisify } from 'node:util'
 import { notarizeMacOS } from './notarize-macos.mjs'
 import { packagingStep } from './packaging-step.mjs'
 import {
+  desktopProductSlug,
+  resolveDesktopProductName,
   resolveMacOSNotarizationEnvironment,
   resolveMacOSSigningEnvironment,
 } from './desktop-release-environment.mjs'
@@ -110,7 +112,7 @@ export async function packageMacOSArtifacts(
     await verifyMacOSAppUpdateConfig(dmgApp, update)
     apple.verifySignature(zipApp, expected)
     apple.verifySignature(dmgApp, expected)
-    const base = `deepseek-harness-${version}-mac-${arch}`
+    const base = `${desktopProductSlug(resolveDesktopProductName(environment))}-${version}-mac-${arch}`
     const artifacts = [
       [dmgOutput, `${base}.dmg`],
       [zipOutput, `${base}.zip`],

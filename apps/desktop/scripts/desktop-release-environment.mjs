@@ -3,6 +3,9 @@
 /** Environment variable that supplies the Electron application identifier. */
 export const DESKTOP_APP_ID_ENV = 'DSH_DESKTOP_APP_ID'
 
+/** Environment variable that supplies the packaged product display name. */
+export const PRODUCT_NAME_ENV = 'DSH_DESKTOP_PRODUCT_NAME'
+
 /** Environment variable that supplies electron-builder's macOS certificate qualifier. */
 export const MACOS_SIGNING_IDENTITY_ENV = 'DSH_DESKTOP_MACOS_SIGNING_IDENTITY'
 
@@ -66,6 +69,31 @@ export function resolveDesktopAppId(env) {
     throw new Error(`desktop release environment: ${DESKTOP_APP_ID_ENV} must be a reverse-DNS identifier`)
   }
   return appId
+}
+
+/**
+ * Resolve the packaged product display name shared by the bundle, installer, and protocol registration.
+ * @param {NodeJS.ProcessEnv} env Packaging environment.
+ * @returns {string} Product display name; the official name unless a local build overrides it.
+ */
+export function resolveDesktopProductName(env) {
+  const value = env[PRODUCT_NAME_ENV]?.trim()
+  if (value === undefined || value === '') return 'DeepSeek Harness'
+  if (value.length > 64 || /[\u0000-\u001f\u007f]/u.test(value)) {
+    throw new Error(`desktop release environment: ${PRODUCT_NAME_ENV} must be 1-64 printable characters`)
+  }
+  return value
+}
+
+/**
+ * Derive the lowercase artifact-name prefix for one product display name.
+ * @param {string} productName Resolved product display name.
+ * @returns {string} Hyphen-separated slug; "deepseek-harness" for the official name.
+ */
+export function desktopProductSlug(productName) {
+  const slug = productName.toLowerCase().replace(/[^a-z0-9]+/gu, '-').replace(/^-+|-+$/gu, '')
+  if (slug === '') throw new Error('desktop release environment: the product name must contain a letter or digit')
+  return slug
 }
 
 /**
