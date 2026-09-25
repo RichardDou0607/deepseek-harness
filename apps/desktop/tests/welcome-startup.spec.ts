@@ -182,6 +182,7 @@ it.each([false, true])('starts welcome onboarding without carrying update focus 
   vi.stubEnv('DSH_DESKTOP_PRIMARY_RUNTIME_DIR', '/runtime/primary-runtime')
   vi.stubEnv('DSH_DESKTOP_HOST_INSPECT_PORT', undefined)
   vi.stubEnv('DSH_DESKTOP_OPEN_DEVTOOLS', '0')
+  vi.stubEnv('DSH_DESKTOP_SPLASH', '0')
   vi.stubEnv('DSH_DESKTOP_MANDATORY_UPDATE_CONFIG', undefined)
   vi.stubEnv('DSH_DESKTOP_UPDATE_JOURNAL_DIR', undefined)
   const reading = Promise.withResolvers<undefined>()

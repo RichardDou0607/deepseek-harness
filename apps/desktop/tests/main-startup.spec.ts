@@ -396,6 +396,7 @@ beforeEach(() => {
   vi.stubEnv('DSH_DESKTOP_MANDATORY_UPDATE_CONFIG', undefined)
   vi.stubEnv('DSH_DESKTOP_UPDATE_JOURNAL_DIR', undefined)
   vi.stubEnv('DSH_CLIENT_VERSION', '1.2.3')
+  vi.stubEnv('DSH_DESKTOP_SPLASH', '0')
 })
 
 afterEach(async () => {
