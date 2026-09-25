@@ -33,6 +33,11 @@ jobs:
         run: pnpm install
       - name: Package unsigned Windows installer
         run: pnpm run package:desktop:win:x64:unsigned
+        env:
+          # The hosted runner session cannot initialize the bundled LibreOfficeKit engine
+          # ("Unknown LibreOfficeKit exception"); office conversion is verified on the
+          # macOS artifact instead and by first use on a real Windows desktop.
+          DSH_DESKTOP_SMOKE_OFFICE: '0'
       - name: Upload unsigned artifacts
         uses: actions/upload-artifact@v4
         with:
