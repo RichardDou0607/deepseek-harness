@@ -1,0 +1,43 @@
+name: Desktop unsigned Windows package
+
+# Manual dispatch only: builds the unsigned NSIS installer on a Windows x64 runner.
+# Unsigned artifacts are for local distribution; recipients pass SmartScreen manually.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Enable Corepack pnpm
+        shell: bash
+        run: corepack enable
+      - name: Write packaging environment
+        shell: bash
+        run: |
+          printf '%s\n' \
+            'DSH_DESKTOP_APP_ID=com.deepseek.harness' \
+            'DSH_DESKTOP_AUTO_UPDATE_ENV=test' \
+            'DSH_DESKTOP_MANDATORY_UPDATE_TEST_ORIGIN=https://127.0.0.1' \
+            "DSH_DESKTOP_MANDATORY_UPDATE_CONFIG='{\"allowedAuthOrigins\":[\"https://login.example.com\"]}'" \
+            > apps/desktop/.env.windows
+      - name: Install dependencies
+        run: pnpm install
+      - name: Package unsigned Windows installer
+        run: pnpm run package:desktop:win:x64:unsigned
+      - name: Upload unsigned artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-harness-win-x64-unsigned
+          path: |
+            apps/desktop/.desktop-build/targets/win-x64/unsigned-artifacts/*.exe
+            apps/desktop/.desktop-build/targets/win-x64/unsigned-artifacts/*.blockmap
+          if-no-files-found: error
