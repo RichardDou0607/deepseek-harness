@@ -14,7 +14,7 @@ DeepSeek Harness（`dsh`）是由 [DeepSeek AI](https://deepseek.com) 开发的�
 
 ## 桌面版
 
-本仓库是把 Harness Web UI 打包为原生桌面应用的 fork。Electron 外壳内嵌完整运行时，以常规应用窗口打开，并在 Host 引导期间显示品牌启动动画；全程不出现浏览器窗口和终端。
+本仓库将 DeepSeek Harness 的 Web UI 打包为原生桌面应用。Electron 外壳内嵌完整运行时，以常规应用窗口打开，并在 Host 引导期间显示品牌启动动画；全程不出现浏览器窗口和终端。
 
 - **macOS（Apple Silicon）：**将 `apps/desktop/.env.macos.example` 复制为 `apps/desktop/.env.macos`，然后运行 `pnpm run package:desktop:mac:arm64:unsigned`。`.dmg`、`.zip` 与解包的 `.app` 会出现在 `apps/desktop/.desktop-build/targets/mac-arm64/unsigned-artifacts/` 下。
 - **Windows（x64）：**手动触发 [Desktop unsigned Windows package](.github/workflows/desktop-unsigned-win.yml) 工作流，从运行的 Artifacts 页下载 `.exe` 安装器。

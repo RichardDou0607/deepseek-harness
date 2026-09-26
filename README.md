@@ -12,7 +12,7 @@ Documentation: [https://deepseek-harness.github.io/deepseek-harness/](https://de
 
 ## Desktop edition
 
-This repository is a fork that packages the Harness Web UI as native desktop applications. The Electron shell embeds the complete runtime, opens as a regular application window, and shows an animated splash while the Host boots; no browser window and no terminal are involved.
+This repository packages the DeepSeek Harness Web UI as native desktop applications. The Electron shell embeds the complete runtime, opens as a regular application window, and shows an animated splash while the Host boots; no browser window and no terminal are involved.
 
 - **macOS (Apple Silicon):** copy `apps/desktop/.env.macos.example` to `apps/desktop/.env.macos`, then run `pnpm run package:desktop:mac:arm64:unsigned`. The `.dmg`, `.zip`, and unpacked `.app` appear under `apps/desktop/.desktop-build/targets/mac-arm64/unsigned-artifacts/`.
 - **Windows (x64):** dispatch the [Desktop unsigned Windows package](.github/workflows/desktop-unsigned-win.yml) workflow and download the `.exe` installer from the run's artifacts.
