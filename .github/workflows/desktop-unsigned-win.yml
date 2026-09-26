@@ -1,5 +1,6 @@
 name: Desktop unsigned Windows package
 
+# Standalone desktop repository build channel.
 # Manual dispatch only: builds the unsigned NSIS installer on a Windows x64 runner.
 # Unsigned artifacts are for local distribution; recipients pass SmartScreen manually.
 on:
