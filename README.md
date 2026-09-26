@@ -4,9 +4,20 @@ English | [中文](README.zh.md)
 
 DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
 
+**This repository is the desktop edition**: it packages the Web UI as native desktop applications for macOS and Windows. See [Desktop edition](#desktop-edition).
+
 It is built on an **everything-is-a-plugin** architecture and powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://arxiv.org/abs/2608.25512).
 
 Documentation: [https://deepseek-harness.github.io/deepseek-harness/](https://deepseek-harness.github.io/deepseek-harness/)
+
+## Desktop edition
+
+This repository is a fork that packages the Harness Web UI as native desktop applications. The Electron shell embeds the complete runtime, opens as a regular application window, and shows an animated splash while the Host boots; no browser window and no terminal are involved.
+
+- **macOS (Apple Silicon):** copy `apps/desktop/.env.macos.example` to `apps/desktop/.env.macos`, then run `pnpm run package:desktop:mac:arm64:unsigned`. The `.dmg`, `.zip`, and unpacked `.app` appear under `apps/desktop/.desktop-build/targets/mac-arm64/unsigned-artifacts/`.
+- **Windows (x64):** dispatch the [Desktop unsigned Windows package](.github/workflows/desktop-unsigned-win.yml) workflow and download the `.exe` installer from the run's artifacts.
+- Builds are unsigned: Windows shows a SmartScreen prompt on first launch, and macOS recipients approve an unidentified developer once. `DSH_DESKTOP_PRODUCT_NAME` in `.env.macos`/`.env.windows` renames the packaged application, and `DSH_DESKTOP_SPLASH=0` disables the splash.
+- `master` mirrors upstream `deepseek-ai/deepseek-harness`; the desktop additions live on the `deepseek-harness-desktop` branch, the repository default.
 
 ## Developer preview
 
